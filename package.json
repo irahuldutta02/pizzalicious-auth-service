@@ -1,0 +1,12 @@
+{
+  "name": "pizzalicious-auth-service",
+  "version": "1.0.0",
+  "description": "auth service for pizzalicious application",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rahul Dutta <https://github.com/irahuldutta02>",
+  "license": "ISC"
+}
