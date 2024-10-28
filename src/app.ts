@@ -9,7 +9,7 @@ const app = express();
 app.use(morgan("combined", { stream }));
 
 app.get("/", (req: Request, res: Response) => {
-  res.status(200).json({ message: "Welcome to Pizzalicious Auth Service!" });
+  res.status(200).json({ message: "Service is Alive!" });
 });
 
 // Resource not found handler
