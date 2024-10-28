@@ -16,9 +16,6 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    rules: {
-      // "no-console": "warn",
-      // "dot-notation": "error",
-    },
+    rules: {},
   },
 );

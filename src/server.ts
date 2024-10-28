@@ -1,6 +1,6 @@
-import { Config } from "./config";
 import app from "./app";
-import logger from "./config/logger";
+import { Config } from "./config";
+import { logger } from "./config/logger";
 
 const startServer = () => {
   try {

@@ -1,28 +1,20 @@
-import express, { NextFunction, Request, Response } from "express";
-import { HttpError } from "http-errors";
-import logger from "./config/logger";
+import express, { Request, Response } from "express";
+import morgan from "morgan";
+import { stream } from "./config/logger";
+import { GlobalErrorHandler, notFound } from "./middleware/error.middleware";
 
 const app = express();
 
-app.get("/", (req, res) => {
+// Setup Morgan to log HTTP requests
+app.use(morgan("combined", { stream }));
+
+app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Welcome to Pizzalicious Auth Service!" });
 });
 
-/** global error handler */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
-  logger.error(err.message);
-  res.status(err.status || 500).json({
-    errors: [
-      {
-        type: err.name,
-        meg: err.message,
-        path: "",
-        location: "",
-      },
-    ],
-    message: err.message,
-  });
-});
+// Resource not found handler
+app.use(notFound);
+// Global error handler
+app.use(GlobalErrorHandler);
 
 export default app;
