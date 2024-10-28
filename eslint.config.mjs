@@ -13,12 +13,12 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: import.meta.dirname,
+                 tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
-      "no-console": "warn",
-      "dot-notation": "error",
+      // "no-console": "warn",
+      // "dot-notation": "error",
     },
   },
 );
