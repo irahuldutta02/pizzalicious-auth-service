@@ -1,7 +1,14 @@
 import { Config } from "./config";
+import app from "./app";
 
-const welcome = () => {
-  console.log(Config.PORT);
+const startServer = () => {
+  try {
+    app.listen(Config.PORT, () => {
+      console.log(`Server is running on port ${Config.PORT}`);
+    });
+  } catch (error) {
+    console.error("Error starting server:", error);
+  }
 };
 
-welcome();
+startServer();
