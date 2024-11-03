@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import morgan from "morgan";
 import { stream } from "./config/logger";
 import { GlobalErrorHandler, notFound } from "./middleware/error.middleware";
+import authRouter from "./routes/auth";
 
 const app = express();
 
@@ -11,6 +12,9 @@ app.use(morgan("combined", { stream }));
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Service is Alive" });
 });
+
+// Register all the routes
+app.use("/auth", authRouter);
 
 // Resource not found handler
 app.use(notFound);
