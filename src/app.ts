@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import express, { Request, Response } from "express";
 import morgan from "morgan";
 import { stream } from "./config/logger";
