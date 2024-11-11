@@ -149,6 +149,25 @@ describe("POST /auth/register", () => {
       expect(users[0].password).toHaveLength(60);
       expect(users[0].password).toMatch(/^\$2[a|b]\$\d+\$/);
     });
+
+    // check for unique email
+    it("should return 400 if email already exists", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: "123456",
+      };
+
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const response = await request(app).post("/auth/register").send(userData);
+
+      expect(response.statusCode).toBe(400);
+    });
   });
 
   describe("Fields missing", () => {

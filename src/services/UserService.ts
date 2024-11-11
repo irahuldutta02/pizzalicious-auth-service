@@ -9,6 +9,14 @@ export class UserService {
   constructor(private userRepository: Repository<User>) {}
 
   async create({ firstName, lastName, email, password }: UserData) {
+    // check if email already exists
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
+    if (existingUser) {
+      throw createHttpError(400, "Email already in use");
+    }
+
     // hash the password
     const salt = 10;
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -24,8 +32,7 @@ export class UserService {
 
       return user;
     } catch {
-      const err = createHttpError(500, "Failed to store data in database");
-      throw err;
+      throw createHttpError(500, "Failed to store data in database");
     }
   }
 }
