@@ -82,6 +82,24 @@ describe("POST /auth/register", () => {
       expect(users[0].lastName).toBe(userData.lastName);
       expect(users[0].email).toBe(userData.email);
     });
+
+    // check if the endpoint returns the id of the user
+    it("should return the id of the user", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: "123456",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      expect(response.statusCode).toBe(201);
+      expect(response.body).toHaveProperty("id");
+    });
   });
 
   describe("Fields missing", () => {
