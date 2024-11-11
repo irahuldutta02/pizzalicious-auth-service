@@ -100,6 +100,10 @@ describe("POST /auth/register", () => {
       // Assert
       expect(response.statusCode).toBe(201);
       expect(response.body).toHaveProperty("id");
+
+      const repository = connection.getRepository(User);
+      const users = await repository.find();
+      expect((response.body as Record<string, string>).id).toBe(users[0].id);
     });
 
     // check for user role
@@ -121,6 +125,29 @@ describe("POST /auth/register", () => {
 
       expect(users[0]).toHaveProperty("role");
       expect(users[0].role).toBe(Roles.CUSTOMER);
+    });
+
+    // check if it is storing hashed password
+    it("should store hashed password", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: "123456",
+      };
+
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+
+      expect(users[0]).toHaveProperty("password");
+      expect(users[0].password).not.toBe(userData.password);
+      expect(users[0].password).toHaveLength(60);
+      expect(users[0].password).toMatch(/^\$2[a|b]\$\d+\$/);
     });
   });
 
