@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import createHttpError, { HttpError } from "http-errors";
-import { logger } from "../config/logger";
 import { Config } from "../config";
+import { logger } from "../config/logger";
 
 // Catch 404 and forward to error handler
 export const notFound = (req: Request, res: Response, next: NextFunction) => {
@@ -36,7 +36,7 @@ export const GlobalErrorHandler = (
     path: req.path,
   };
 
-  if (Config.NODE_ENV === "development") {
+  if (Config.NODE_ENV === "dev") {
     errorObj.stack = err.stack;
   }
 

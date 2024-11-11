@@ -1,7 +1,28 @@
 import request from "supertest";
+import { DataSource } from "typeorm";
 import app from "../../app";
+import { AppDataSource } from "../../config/data-source";
+import { truncateTables } from "../utils";
+import { User } from "../../entity/User";
 
 describe("POST /auth/register", () => {
+  let connection: DataSource;
+
+  beforeAll(async () => {
+    // initialize database connection
+    connection = await AppDataSource.initialize();
+  });
+
+  beforeEach(async () => {
+    // database truncate
+    await truncateTables(connection);
+  });
+
+  afterAll(async () => {
+    // close database connection
+    await connection.destroy();
+  });
+
   describe("Given all fields", () => {
     // check if the endpoint returns 201
     it("should return 201", async () => {
@@ -40,7 +61,7 @@ describe("POST /auth/register", () => {
     });
 
     // check the database connection
-    it("should persist the the user in the database", async () => {
+    it("should persist the user in the database", async () => {
       // Arrange
       const userData = {
         firstName: "Rafael",
@@ -50,11 +71,20 @@ describe("POST /auth/register", () => {
       };
 
       // Act
-      const response = await request(app).post("/auth/register").send(userData);
+      await request(app).post("/auth/register").send(userData);
 
       // Assert
-      expect(response.statusCode).toBe(201);
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+
+      expect(users).toHaveLength(1);
+      expect(users[0].firstName).toBe(userData.firstName);
+      expect(users[0].lastName).toBe(userData.lastName);
+      expect(users[0].email).toBe(userData.email);
     });
   });
-  describe("Fields missing", () => {});
+
+  describe("Fields missing", () => {
+    // Add tests for missing fields
+  });
 });

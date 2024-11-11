@@ -7,6 +7,7 @@ import { GlobalErrorHandler, notFound } from "./middleware/error.middleware";
 import authRouter from "./routes/auth";
 
 const app = express();
+app.use(express.json());
 
 // Setup Morgan to log HTTP requests
 app.use(morgan("combined", { stream }));
