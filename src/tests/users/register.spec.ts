@@ -25,14 +25,13 @@ describe("POST /auth/register", () => {
   });
 
   describe("Given all fields", () => {
-    // check if the endpoint returns 201
     it("should return 201", async () => {
       // Arrange
       const userData = {
         firstName: "Rafael",
         lastName: "Dias",
         email: "rdtech2002@gmail.com",
-        password: "123456",
+        password: "12345678",
       };
 
       // Act
@@ -42,14 +41,13 @@ describe("POST /auth/register", () => {
       expect(response.statusCode).toBe(201);
     });
 
-    // check if the endpoint returns json
     it("should return valid json response", async () => {
       // Arrange
       const userData = {
         firstName: "Rafael",
         lastName: "Dias",
         email: "rdtech2002@gmail.com",
-        password: "123456",
+        password: "12345678",
       };
 
       // Act
@@ -61,14 +59,13 @@ describe("POST /auth/register", () => {
       );
     });
 
-    // check the database connection
     it("should persist the user in the database", async () => {
       // Arrange
       const userData = {
         firstName: "Rafael",
         lastName: "Dias",
         email: "rdtech2002@gmail.com",
-        password: "123456",
+        password: "12345678",
       };
 
       // Act
@@ -84,14 +81,13 @@ describe("POST /auth/register", () => {
       expect(users[0].email).toBe(userData.email);
     });
 
-    // check if the endpoint returns the id of the user
     it("should return the id of the user", async () => {
       // Arrange
       const userData = {
         firstName: "Rafael",
         lastName: "Dias",
         email: "rdtech2002@gmail.com",
-        password: "123456",
+        password: "12345678",
       };
 
       // Act
@@ -106,14 +102,13 @@ describe("POST /auth/register", () => {
       expect((response.body as Record<string, string>).id).toBe(users[0].id);
     });
 
-    // check for user role
     it("should assign the user role", async () => {
       // Arrange
       const userData = {
         firstName: "Rafael",
         lastName: "Dias",
         email: "rdtech2002@gmail.com",
-        password: "123456",
+        password: "12345678",
       };
 
       // Act
@@ -127,14 +122,13 @@ describe("POST /auth/register", () => {
       expect(users[0].role).toBe(Roles.CUSTOMER);
     });
 
-    // check if it is storing hashed password
     it("should store hashed password", async () => {
       // Arrange
       const userData = {
         firstName: "Rafael",
         lastName: "Dias",
         email: "rdtech2002@gmail.com",
-        password: "123456",
+        password: "12345678",
       };
 
       // Act
@@ -150,14 +144,13 @@ describe("POST /auth/register", () => {
       expect(users[0].password).toMatch(/^\$2[a|b]\$\d+\$/);
     });
 
-    // check for unique email
     it("should return 400 if email already exists", async () => {
       // Arrange
       const userData = {
         firstName: "Rafael",
         lastName: "Dias",
         email: "rdtech2002@gmail.com",
-        password: "123456",
+        password: "12345678",
       };
 
       // Act
@@ -170,7 +163,113 @@ describe("POST /auth/register", () => {
     });
   });
 
-  describe("Fields missing", () => {
-    // Add tests for missing fields
+  describe("Fields Validation", () => {
+    it("should return 400 if firstName is missing", async () => {
+      // Arrange
+      const userData = {
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: "12345678",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("should return 400 if lastName is missing", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        email: "rdtech2002@gmail.com",
+        password: "12345678",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("should return 400 if email is missing", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        password: "12345678",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("should return 400 if email is invalid", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail",
+        password: "12345678",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("should return 400 if email is empty string", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "",
+        password: "12345678",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("should return 400 if password is missing", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("password should be at least 8 chars", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: "1234567",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      expect(response.statusCode).toBe(400);
+    });
   });
 });

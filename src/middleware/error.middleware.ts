@@ -30,10 +30,12 @@ export const GlobalErrorHandler = (
     meg: string;
     path: string;
     stack?: string;
+    location: string;
   } = {
     type: err.name,
     meg: message,
     path: req.path,
+    location: "",
   };
 
   if (Config.NODE_ENV === "dev") {
