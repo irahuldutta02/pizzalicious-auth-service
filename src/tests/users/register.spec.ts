@@ -4,6 +4,7 @@ import app from "../../app";
 import { AppDataSource } from "../../config/data-source";
 import { truncateTables } from "../utils";
 import { User } from "../../entity/User";
+import { Roles } from "../../constants";
 
 describe("POST /auth/register", () => {
   let connection: DataSource;
@@ -99,6 +100,27 @@ describe("POST /auth/register", () => {
       // Assert
       expect(response.statusCode).toBe(201);
       expect(response.body).toHaveProperty("id");
+    });
+
+    // check for user role
+    it("should assign the user role", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: "123456",
+      };
+
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+
+      expect(users[0]).toHaveProperty("role");
+      expect(users[0].role).toBe(Roles.CUSTOMER);
     });
   });
 
