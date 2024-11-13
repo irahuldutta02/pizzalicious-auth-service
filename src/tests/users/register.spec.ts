@@ -1,11 +1,11 @@
+import bcrypt from "bcrypt";
 import request from "supertest";
 import { DataSource } from "typeorm";
 import app from "../../app";
 import { AppDataSource } from "../../config/data-source";
-import { truncateTables } from "../utils";
-import { User } from "../../entity/User";
 import { Roles } from "../../constants";
-import bcrypt from "bcrypt";
+import { User } from "../../entity/User";
+import { truncateTables } from "../utils";
 
 describe("POST /auth/register", () => {
   let connection: DataSource;
