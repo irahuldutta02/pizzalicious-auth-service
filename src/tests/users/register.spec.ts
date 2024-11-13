@@ -5,6 +5,7 @@ import { AppDataSource } from "../../config/data-source";
 import { truncateTables } from "../utils";
 import { User } from "../../entity/User";
 import { Roles } from "../../constants";
+import bcrypt from "bcrypt";
 
 describe("POST /auth/register", () => {
   let connection: DataSource;
@@ -270,6 +271,87 @@ describe("POST /auth/register", () => {
 
       // Assert
       expect(response.statusCode).toBe(400);
+    });
+
+    it("should trim email before saving", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: " rdtech2002@gmail.com ",
+        password: "12345678",
+      };
+
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+
+      expect(users[0]).toHaveProperty("email");
+      expect(users[0].email).toBe("rdtech2002@gmail.com");
+    });
+
+    it("should trim firstName before saving", async () => {
+      // Arrange
+      const userData = {
+        firstName: " Rafael ",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: "12345678",
+      };
+
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+
+      expect(users[0]).toHaveProperty("firstName");
+      expect(users[0].firstName).toBe("Rafael");
+    });
+
+    it("should trim lastName before saving", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: " Dias ",
+        email: "rdtech2002@gmail.com",
+        password: "12345678",
+      };
+
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+
+      expect(users[0]).toHaveProperty("lastName");
+      expect(users[0].lastName).toBe("Dias");
+    });
+
+    it("should trim password before saving", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: " 12345678 ",
+      };
+
+      // Act
+      await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const userRepository = connection.getRepository(User);
+      const users = await userRepository.find();
+
+      expect(users[0]).toHaveProperty("password");
+      const isMatch = await bcrypt.compare("12345678", users[0].password);
+      expect(isMatch).toBe(true);
     });
   });
 });
