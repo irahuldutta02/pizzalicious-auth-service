@@ -4,8 +4,9 @@ import { DataSource } from "typeorm";
 import app from "../../app";
 import { AppDataSource } from "../../config/data-source";
 import { Roles } from "../../constants";
+import { RefreshToken } from "../../entity/RefreshToken";
 import { User } from "../../entity/User";
-import { isJwt, truncateTables } from "../utils";
+import { isJwt } from "../utils";
 
 describe("POST /auth/register", () => {
   let connection: DataSource;
@@ -16,8 +17,9 @@ describe("POST /auth/register", () => {
   });
 
   beforeEach(async () => {
-    // database truncate
-    await truncateTables(connection);
+    // database delete and create
+    await connection.dropDatabase();
+    await connection.synchronize();
   });
 
   afterAll(async () => {
@@ -200,6 +202,31 @@ describe("POST /auth/register", () => {
 
       expect(isJwt(accessToken)).toBeTruthy();
       expect(isJwt(refreshToken)).toBeTruthy();
+    });
+
+    it("should store the refresh token in the database", async () => {
+      // Arrange
+      const userData = {
+        firstName: "Rafael",
+        lastName: "Dias",
+        email: "rdtech2002@gmail.com",
+        password: "12345678",
+      };
+
+      // Act
+      const response = await request(app).post("/auth/register").send(userData);
+
+      // Assert
+      const refreshTokenRepo = connection.getRepository(RefreshToken);
+
+      const tokens = await refreshTokenRepo
+        .createQueryBuilder("refreshToken")
+        .where("refreshToken.userId = :userId", {
+          userId: (response.body as Record<string, string>).id,
+        })
+        .getMany();
+
+      expect(tokens).toHaveLength(1);
     });
   });
 
