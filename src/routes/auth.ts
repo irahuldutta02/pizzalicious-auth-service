@@ -9,11 +9,13 @@ import { logger } from "../config/logger";
 import { AuthController } from "../controllers/AuthController";
 import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
+import { CredentialService } from "../services/CredentialService";
 import { TokenService } from "../services/TokenService";
 import { UserService } from "../services/UserService";
 import loginValidator from "../validators/login-validator";
 import registerValidator from "../validators/register-validator";
-import { CredentialService } from "../services/CredentialService";
+import { AuthRequest } from "../types";
+import authMiddleware from "../middleware/auth.middleware";
 
 const authRouter = express.Router();
 
@@ -49,5 +51,13 @@ authRouter.post("/login", loginValidator, (async (
 ) => {
   await authController.login(req, res, next);
 }) as RequestHandler);
+
+authRouter.get(
+  "/self",
+  authMiddleware as RequestHandler,
+  (async (req: AuthRequest, res: Response, next: NextFunction) => {
+    await authController.self(req, res, next);
+  }) as RequestHandler,
+);
 
 export default authRouter;
