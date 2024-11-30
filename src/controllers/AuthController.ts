@@ -6,7 +6,12 @@ import { Logger } from "winston";
 import { CredentialService } from "../services/CredentialService";
 import { TokenService } from "../services/TokenService";
 import { UserService } from "../services/UserService";
-import { AuthRequest, LoginUserRequest, RegisterUserRequest } from "../types";
+import {
+  AuthRequest,
+  LoginUserRequest,
+  RegisterUserRequest,
+  UserWithoutSensitiveData,
+} from "../types";
 
 export class AuthController {
   constructor(
@@ -153,8 +158,13 @@ export class AuthController {
   async self(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const user = await this.userService.findById(Number(req.auth.sub));
-      res.status(200).json(user);
+      const userWithoutSensitiveData = {
+        ...user,
+      } as UserWithoutSensitiveData;
+      delete userWithoutSensitiveData.password;
+      res.status(200).json(userWithoutSensitiveData);
     } catch (error) {
+      console.log(error);
       next(error);
       return;
     }
