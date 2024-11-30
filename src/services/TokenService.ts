@@ -6,6 +6,7 @@ import { Repository } from "typeorm";
 import { Config } from "../config";
 import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
+import { AppDataSource } from "../config/data-source";
 
 export class TokenService {
   constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
@@ -48,5 +49,12 @@ export class TokenService {
     });
 
     return newRefreshToken;
+  }
+
+  async deleteRefreshToken(id: number) {
+    const refreshTokenRepo = AppDataSource.getRepository(RefreshToken);
+    await refreshTokenRepo.delete({
+      id,
+    });
   }
 }

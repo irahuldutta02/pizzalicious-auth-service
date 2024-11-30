@@ -16,6 +16,7 @@ import loginValidator from "../validators/login-validator";
 import registerValidator from "../validators/register-validator";
 import { AuthRequest } from "../types";
 import authMiddleware from "../middleware/auth.middleware";
+import validateRefreshTokenMiddleware from "../middleware/validateRefreshToken.middleware";
 
 const authRouter = express.Router();
 
@@ -57,6 +58,14 @@ authRouter.get(
   authMiddleware as RequestHandler,
   (async (req: AuthRequest, res: Response, next: NextFunction) => {
     await authController.self(req, res, next);
+  }) as RequestHandler,
+);
+
+authRouter.post(
+  "/refresh",
+  validateRefreshTokenMiddleware as RequestHandler,
+  (async (req: AuthRequest, res: Response, next: NextFunction) => {
+    await authController.refresh(req, res, next);
   }) as RequestHandler,
 );
 

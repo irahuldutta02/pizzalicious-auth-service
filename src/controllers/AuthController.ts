@@ -12,6 +12,7 @@ import {
   RegisterUserRequest,
   UserWithoutSensitiveData,
 } from "../types";
+import { Config } from "../config";
 
 export class AuthController {
   constructor(
@@ -50,6 +51,9 @@ export class AuthController {
       const payload: JwtPayload = {
         sub: String(user.id),
         role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
       };
 
       const accessToken = this.tokenService.generateAccessToken(payload);
@@ -118,6 +122,9 @@ export class AuthController {
       const payload: JwtPayload = {
         sub: String(user.id),
         role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
       };
 
       const accessToken = this.tokenService.generateAccessToken(payload);
@@ -163,6 +170,61 @@ export class AuthController {
       } as UserWithoutSensitiveData;
       delete userWithoutSensitiveData.password;
       res.status(200).json(userWithoutSensitiveData);
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
+
+  async refresh(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const payload: JwtPayload = {
+        sub: req.auth.sub,
+        role: req.auth.role,
+        firstName: req.auth.firstName,
+        lastName: req.auth.lastName,
+        email: req.auth.email,
+      };
+
+      const accessToken = this.tokenService.generateAccessToken(payload);
+
+      const user = await this.userService.findById(Number(req.auth.sub));
+      if (!user) {
+        const error = createHttpError(
+          400,
+          "User with the token could not find",
+        );
+        next(error);
+        return;
+      }
+
+      // Persist the refresh token
+      const newRefreshToken = await this.tokenService.persistRefreshToken(user);
+
+      // Delete old refresh token
+      await this.tokenService.deleteRefreshToken(Number(req.auth.id));
+
+      const refreshToken = this.tokenService.generateRefreshToken({
+        ...payload,
+        id: String(newRefreshToken.id),
+      });
+
+      res.cookie("accessToken", accessToken, {
+        domain: Config.MAIN_DOMAIN,
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 1, // 1d
+        httpOnly: true, // Very important
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        domain: Config.MAIN_DOMAIN,
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 365, // 1y
+        httpOnly: true, // Very important
+      });
+
+      this.logger.info("User has been logged in", { id: user.id });
+      res.json({ id: user.id });
     } catch (error) {
       next(error);
       return;
