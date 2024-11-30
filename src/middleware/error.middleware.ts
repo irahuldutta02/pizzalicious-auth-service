@@ -17,7 +17,7 @@ export const GlobalErrorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction,
 ) => {
-  let statusCode = err.status || 500;
+  let statusCode = err.status || err.statusCode || 500;
   let message = err.message;
 
   if (err.name === "CastError" && err.kind === "ObjectId") {
