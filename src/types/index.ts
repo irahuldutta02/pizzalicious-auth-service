@@ -7,6 +7,29 @@ export interface UserData {
   password: string;
 }
 
+export interface LoginUserData {
+  email: string;
+  password: string;
+}
+
+export interface UserWithoutSensitiveData {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  createdAt: number;
+  updatedAt: number;
+  password?: string;
+}
+
 export interface RegisterUserRequest extends Request {
   body: UserData;
+}
+
+export interface LoginUserRequest extends Request {
+  body: {
+    email: string;
+    password: string;
+  };
 }

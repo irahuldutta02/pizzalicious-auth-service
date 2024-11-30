@@ -35,4 +35,10 @@ export class UserService {
       throw createHttpError(500, "Failed to store data in database");
     }
   }
+
+  async findByEmail(email: string) {
+    return await this.userRepository.findOne({
+      where: { email },
+    });
+  }
 }
