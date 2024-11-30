@@ -23,7 +23,8 @@ describe("POST /auth/register", () => {
   });
 
   afterAll(async () => {
-    // close database connection
+    // delete & close database connection
+    await connection.dropDatabase();
     await connection.destroy();
   });
 

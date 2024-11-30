@@ -21,7 +21,8 @@ describe("POST /auth/login", () => {
   });
 
   afterAll(async () => {
-    // close database connection
+    // delete & close database connection
+    await connection.dropDatabase();
     await connection.destroy();
   });
 

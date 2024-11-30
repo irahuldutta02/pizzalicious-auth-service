@@ -27,7 +27,8 @@ describe("GET /auth/self", () => {
   });
 
   afterAll(async () => {
-    // close database connection
+    // delete & close database connection
+    await connection.dropDatabase();
     await connection.destroy();
   });
 
