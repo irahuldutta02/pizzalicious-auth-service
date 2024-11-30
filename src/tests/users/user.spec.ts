@@ -109,5 +109,12 @@ describe("GET /auth/self", () => {
       expect(response.statusCode).toBe(200);
       expect(response.body).not.toHaveProperty("password");
     });
+
+    it("should return 401 status code if the token is invalid or not present", async () => {
+      const response = await request(app).get("/auth/self").send();
+
+      // assert
+      expect(response.statusCode).toBe(401);
+    });
   });
 });
