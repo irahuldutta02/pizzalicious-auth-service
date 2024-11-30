@@ -12,7 +12,6 @@ import {
   RegisterUserRequest,
   UserWithoutSensitiveData,
 } from "../types";
-import { Config } from "../config";
 
 export class AuthController {
   constructor(
@@ -65,17 +64,10 @@ export class AuthController {
         id: newRefreshToken.id,
       });
 
-      res.cookie("accessToken", accessToken, {
-        domain: "localhost",
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60, // 1 hour
-        httpOnly: true, // very important
-      });
-
-      res.cookie("refreshToken", refreshToken, {
-        domain: "localhost",
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+      // Set cookies
+      this.tokenService.setCookie(res, {
+        accessToken,
+        refreshToken,
       });
 
       res.status(201).json({ id: user.id });
@@ -136,17 +128,10 @@ export class AuthController {
         id: newRefreshToken.id,
       });
 
-      res.cookie("accessToken", accessToken, {
-        domain: "localhost",
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60, // 1 hour
-        httpOnly: true, // very important
-      });
-
-      res.cookie("refreshToken", refreshToken, {
-        domain: "localhost",
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+      // Set cookies
+      this.tokenService.setCookie(res, {
+        accessToken,
+        refreshToken,
       });
 
       this.logger.info("User logged in successfully", {
@@ -186,6 +171,7 @@ export class AuthController {
         email: req.auth.email,
       };
 
+      // Generate new access token
       const accessToken = this.tokenService.generateAccessToken(payload);
 
       const user = await this.userService.findById(Number(req.auth.sub));
@@ -204,26 +190,21 @@ export class AuthController {
       // Delete old refresh token
       await this.tokenService.deleteRefreshToken(Number(req.auth.id));
 
+      // Generate new refresh token
       const refreshToken = this.tokenService.generateRefreshToken({
         ...payload,
         id: String(newRefreshToken.id),
       });
 
-      res.cookie("accessToken", accessToken, {
-        domain: Config.MAIN_DOMAIN,
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60 * 24 * 1, // 1d
-        httpOnly: true, // Very important
+      // Set cookies
+      this.tokenService.setCookie(res, {
+        accessToken,
+        refreshToken,
       });
 
-      res.cookie("refreshToken", refreshToken, {
-        domain: Config.MAIN_DOMAIN,
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60 * 24 * 365, // 1y
-        httpOnly: true, // Very important
-      });
-
-      this.logger.info("User has been logged in", { id: user.id });
+      this.logger.info(
+        "New access token and refresh token have been generated",
+      );
       res.json({ id: user.id });
     } catch (error) {
       next(error);

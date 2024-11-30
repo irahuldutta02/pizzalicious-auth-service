@@ -7,6 +7,7 @@ import { Config } from "../config";
 import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
 import { AppDataSource } from "../config/data-source";
+import { Response } from "express";
 
 export class TokenService {
   constructor(private refreshTokenRepository: Repository<RefreshToken>) {}
@@ -55,6 +56,25 @@ export class TokenService {
     const refreshTokenRepo = AppDataSource.getRepository(RefreshToken);
     await refreshTokenRepo.delete({
       id,
+    });
+  }
+
+  setCookie(
+    res: Response,
+    payload: { accessToken: string; refreshToken: string },
+  ) {
+    res.cookie("accessToken", payload.accessToken, {
+      domain: Config.MAIN_DOMAIN,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 1, // 1d
+      httpOnly: true, // Very important
+    });
+
+    res.cookie("refreshToken", payload.refreshToken, {
+      domain: Config.MAIN_DOMAIN,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 365, // 1y
+      httpOnly: true, // Very important
     });
   }
 }
