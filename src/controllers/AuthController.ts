@@ -164,7 +164,6 @@ export class AuthController {
       delete userWithoutSensitiveData.password;
       res.status(200).json(userWithoutSensitiveData);
     } catch (error) {
-      console.log(error);
       next(error);
       return;
     }
