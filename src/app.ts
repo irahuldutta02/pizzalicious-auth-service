@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import { stream } from "./config/logger";
 import { GlobalErrorHandler, notFound } from "./middleware/error.middleware";
 import authRouter from "./routes/auth";
+import tenantRouter from "./routes/tenant";
 
 const app = express();
 app.use(express.static("public"));
@@ -21,6 +22,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // Register all the routes
 app.use("/auth", authRouter);
+app.use("/tenants", tenantRouter);
 
 // Resource not found handler
 app.use(notFound);
